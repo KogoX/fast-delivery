@@ -22,7 +22,7 @@ import {
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Label } from "@/components/ui/label"
 import { createClient } from "@/lib/supabase/client"
-import { initiateStkPush } from "@/app/actions/mpesa"
+import { initiatePayment } from "@/app/actions/mpesa" // FIXED: Correct import
 
 const BARATON_LOCATIONS = [
   "Baraton University Main Gate",
@@ -99,6 +99,7 @@ export default function BookRide() {
         payment_method: paymentMethod,
         status: "pending",
         payment_status: paymentMethod === "cash" ? "pending" : "processing",
+        total_amount: total, // FIXED: Added missing required field 'total_amount'
       })
       .select()
       .single()
@@ -111,15 +112,16 @@ export default function BookRide() {
 
     // If M-Pesa payment, initiate STK push
     if (paymentMethod === "mpesa") {
-      const mpesaResult = await initiateStkPush({
+      // FIXED: Updated to match app/actions/mpesa.ts parameters
+      const mpesaResult = await initiatePayment({
         phoneNumber: phoneNumber,
         amount: total,
-        orderId: rideData.id,
-        orderType: "ride",
-        description: `Baraton Ride: ${pickupLocation} to ${destination}`,
+        referenceId: rideData.id, 
+        type: "ride",
+        description: `Baraton Ride`,
       })
 
-      if (!mpesaResult.success) {
+      if (mpesaResult.error) { // FIXED: Check for .error property
         setError(mpesaResult.error || "Failed to initiate M-Pesa payment")
         // Update ride status to payment failed
         await supabase
