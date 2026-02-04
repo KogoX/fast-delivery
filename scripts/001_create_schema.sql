@@ -27,7 +27,7 @@ CREATE TABLE IF NOT EXISTS public.rides (
   pickup_location TEXT NOT NULL,
   destination TEXT NOT NULL,
   ride_type TEXT NOT NULL CHECK (ride_type IN ('car', 'bike')),
-  payment_method TEXT NOT NULL CHECK (payment_method IN ('wallet', 'card', 'cash')),
+  payment_method TEXT NOT NULL CHECK (payment_method IN ('mpesa', 'card')),
   fare DECIMAL(10, 2) NOT NULL,
   service_fee DECIMAL(10, 2) DEFAULT 50,
   total_amount DECIMAL(10, 2) NOT NULL,
@@ -89,7 +89,7 @@ CREATE TABLE IF NOT EXISTS public.food_orders (
   subtotal DECIMAL(10, 2) NOT NULL,
   delivery_fee DECIMAL(10, 2) DEFAULT 300,
   total_amount DECIMAL(10, 2) NOT NULL,
-  payment_method TEXT NOT NULL CHECK (payment_method IN ('wallet', 'card', 'cash')),
+  payment_method TEXT NOT NULL CHECK (payment_method IN ('mpesa', 'card')),
   delivery_location TEXT NOT NULL,
   status TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'preparing', 'on_the_way', 'delivered', 'cancelled')),
   cancellation_reason TEXT,
@@ -114,7 +114,7 @@ CREATE TABLE IF NOT EXISTS public.package_deliveries (
   package_size TEXT NOT NULL CHECK (package_size IN ('small', 'medium', 'large', 'extra-large')),
   delivery_time TEXT NOT NULL CHECK (delivery_time IN ('standard', 'express', 'scheduled')),
   delivery_notes TEXT,
-  payment_method TEXT NOT NULL CHECK (payment_method IN ('wallet', 'card', 'cash')),
+  payment_method TEXT NOT NULL CHECK (payment_method IN ('mpesa', 'card')),
   delivery_fee DECIMAL(10, 2) NOT NULL,
   service_fee DECIMAL(10, 2) DEFAULT 50,
   total_amount DECIMAL(10, 2) NOT NULL,
@@ -142,7 +142,7 @@ CREATE TABLE IF NOT EXISTS public.errands (
   urgency TEXT NOT NULL CHECK (urgency IN ('standard', 'urgent', 'scheduled')),
   scheduled_time TIMESTAMP WITH TIME ZONE,
   additional_notes TEXT,
-  payment_method TEXT NOT NULL CHECK (payment_method IN ('wallet', 'card', 'cash')),
+  payment_method TEXT NOT NULL CHECK (payment_method IN ('mpesa', 'card')),
   service_fee DECIMAL(10, 2) NOT NULL,
   platform_fee DECIMAL(10, 2) DEFAULT 50,
   total_amount DECIMAL(10, 2) NOT NULL,
@@ -166,7 +166,7 @@ INSERT INTO public.restaurants (name, image, rating, delivery_time, tags) VALUES
   ('Bowen Grill House', '/placeholder.svg?height=80&width=80', 4.2, '20-30 min', ARRAY['Grill', 'Fast Food']),
   ('Green Leaf Cafe', '/placeholder.svg?height=80&width=80', 4.7, '10-15 min', ARRAY['Healthy', 'Salads']);
 
--- Insert sample menu items (need to get restaurant IDs first)
+-- Insert sample menu items
 DO $$
 DECLARE
   cafeteria_id UUID;
