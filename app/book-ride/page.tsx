@@ -14,15 +14,14 @@ import {
   Car,
   Bike,
   Smartphone,
-  Wallet,
-  Banknote,
+  CreditCard,
   ChevronRight,
   Loader2,
 } from "lucide-react"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Label } from "@/components/ui/label"
 import { createClient } from "@/lib/supabase/client"
-import { initiatePayment } from "@/app/actions/mpesa" // FIXED: Correct import
+import { initiatePayment } from "@/app/actions/mpesa"
 
 const BARATON_LOCATIONS = [
   "Baraton University Main Gate",
@@ -96,10 +95,10 @@ export default function BookRide() {
         destination: destination,
         ride_type: rideType,
         fare: total,
-        payment_method: paymentMethod,
+        payment_method: paymentMethod, // 'mpesa' or 'card'
         status: "pending",
-        payment_status: paymentMethod === "cash" ? "pending" : "processing",
-        total_amount: total, // FIXED: Added missing required field 'total_amount'
+        payment_status: "pending", // Both card and mpesa start as pending
+        total_amount: total,
       })
       .select()
       .single()
@@ -112,7 +111,6 @@ export default function BookRide() {
 
     // If M-Pesa payment, initiate STK push
     if (paymentMethod === "mpesa") {
-      // FIXED: Updated to match app/actions/mpesa.ts parameters
       const mpesaResult = await initiatePayment({
         phoneNumber: phoneNumber,
         amount: total,
@@ -121,9 +119,8 @@ export default function BookRide() {
         description: `Baraton Ride`,
       })
 
-      if (mpesaResult.error) { // FIXED: Check for .error property
+      if (mpesaResult.error) {
         setError(mpesaResult.error || "Failed to initiate M-Pesa payment")
-        // Update ride status to payment failed
         await supabase
           .from("rides")
           .update({ payment_status: "failed" })
@@ -131,6 +128,9 @@ export default function BookRide() {
         setIsLoading(false)
         return
       }
+    } else if (paymentMethod === "card") {
+      // For Visa/Card, we just simulate success or redirect to a card gateway
+      // Since no gateway is integrated yet, we just proceed
     }
 
     // Store ride ID in session storage for confirmation page
@@ -300,23 +300,12 @@ export default function BookRide() {
           </div>
 
           <div className="flex items-center space-x-3 border rounded-lg p-3 bg-background">
-            <RadioGroupItem value="wallet" id="wallet" />
-            <Label htmlFor="wallet" className="flex items-center flex-1 cursor-pointer">
-              <Wallet className="h-5 w-5 text-primary mr-3" />
+            <RadioGroupItem value="card" id="card" />
+            <Label htmlFor="card" className="flex items-center flex-1 cursor-pointer">
+              <CreditCard className="h-5 w-5 text-primary mr-3" />
               <div>
-                <p className="font-medium text-foreground">BaratonPay Wallet</p>
-                <p className="text-sm text-muted-foreground">Balance: KES 2,500</p>
-              </div>
-            </Label>
-          </div>
-
-          <div className="flex items-center space-x-3 border rounded-lg p-3 bg-background">
-            <RadioGroupItem value="cash" id="cash" />
-            <Label htmlFor="cash" className="flex items-center flex-1 cursor-pointer">
-              <Banknote className="h-5 w-5 text-primary mr-3" />
-              <div>
-                <p className="font-medium text-foreground">Cash</p>
-                <p className="text-sm text-muted-foreground">Pay directly to driver</p>
+                <p className="font-medium text-foreground">Visa / Mastercard</p>
+                <p className="text-sm text-muted-foreground">Pay securely with card</p>
               </div>
             </Label>
           </div>

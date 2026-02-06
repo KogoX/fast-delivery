@@ -6,18 +6,18 @@ import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
-import { ArrowLeft, Search, Clock, Star, ShoppingCart, Plus, Minus, ChevronRight, Loader2, Smartphone, Wallet, Banknote } from "lucide-react"
+import { ArrowLeft, Search, Clock, Star, ShoppingCart, Plus, Minus, ChevronRight, Loader2, Smartphone, CreditCard } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Label } from "@/components/ui/label"
 import { createClient } from "@/lib/supabase/client"
-import { initiateStkPush } from "@/app/actions/mpesa"
+import { initiatePayment } from "@/app/actions/mpesa"
 
 interface Restaurant {
   id: string
   name: string
-  image_url: string | null
+  image: string | null
   rating: number
   delivery_time: string
   tags: string[]
@@ -27,7 +27,7 @@ interface MenuItem {
   id: string
   name: string
   price: number
-  image_url: string | null
+  image: string | null
   description: string
   restaurant_id: string
 }
@@ -147,10 +147,11 @@ export default function FoodDelivery() {
           quantity: item.quantity
         })),
         total_amount: finalTotal,
-        delivery_address: deliveryLocation,
+        subtotal: totalAmount,
+        delivery_location: deliveryLocation,
         status: "pending",
-        payment_method: paymentMethod,
-        payment_status: paymentMethod === "cash" ? "pending" : "processing",
+        payment_method: paymentMethod, // 'mpesa' or 'card'
+        payment_status: "pending",
       })
       .select()
       .single()
@@ -163,15 +164,15 @@ export default function FoodDelivery() {
 
     // If M-Pesa payment, initiate STK push
     if (paymentMethod === "mpesa") {
-      const mpesaResult = await initiateStkPush({
+      const mpesaResult = await initiatePayment({
         phoneNumber: phoneNumber,
         amount: finalTotal,
-        orderId: order.id,
-        orderType: "food_order",
+        referenceId: order.id,
+        type: "food_order",
         description: `Baraton Food Order - ${cartItems.length} items`,
       })
 
-      if (!mpesaResult.success) {
+      if (mpesaResult.error) {
         setError(mpesaResult.error || "Failed to initiate M-Pesa payment")
         await supabase
           .from("food_orders")
@@ -191,7 +192,7 @@ export default function FoodDelivery() {
 
   const filteredMenuItems = menuItems.filter(item => 
     item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    item.description.toLowerCase().includes(searchQuery.toLowerCase())
+    item.description?.toLowerCase().includes(searchQuery.toLowerCase())
   )
 
   if (isLoading) {
@@ -274,7 +275,7 @@ export default function FoodDelivery() {
                 <div className="flex">
                   <div className="w-20 h-20 bg-muted flex-shrink-0">
                     <img
-                      src={restaurant.image_url || "/placeholder.svg?height=80&width=80"}
+                      src={restaurant.image || "/placeholder.svg?height=80&width=80"}
                       alt={restaurant.name}
                       className="w-full h-full object-cover"
                     />
@@ -314,7 +315,7 @@ export default function FoodDelivery() {
                 <div className="flex">
                   <div className="w-16 h-16 bg-muted rounded-md flex-shrink-0">
                     <img
-                      src={item.image_url || "/placeholder.svg?height=60&width=60"}
+                      src={item.image || "/placeholder.svg?height=60&width=60"}
                       alt={item.name}
                       className="w-full h-full object-cover rounded-md"
                     />
@@ -417,10 +418,10 @@ export default function FoodDelivery() {
                   </Label>
                 </div>
                 <div className="flex items-center space-x-3 border rounded-lg p-3">
-                  <RadioGroupItem value="cash" id="cash-checkout" />
-                  <Label htmlFor="cash-checkout" className="flex items-center flex-1 cursor-pointer">
-                    <Banknote className="h-5 w-5 text-primary mr-3" />
-                    <span className="font-medium text-foreground">Cash on Delivery</span>
+                  <RadioGroupItem value="card" id="card-checkout" />
+                  <Label htmlFor="card-checkout" className="flex items-center flex-1 cursor-pointer">
+                    <CreditCard className="h-5 w-5 text-primary mr-3" />
+                    <span className="font-medium text-foreground">Visa / Mastercard</span>
                   </Label>
                 </div>
               </RadioGroup>
@@ -480,7 +481,7 @@ export default function FoodDelivery() {
         </div>
       )}
 
-      {/* Cart Summary (only show if items in cart and checkout not open) */}
+      {/* Cart Summary */}
       {totalItems > 0 && !showCheckout && (
         <div className="bg-background p-4 border-t">
           <div className="flex items-center justify-between mb-4">

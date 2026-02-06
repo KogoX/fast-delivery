@@ -7,12 +7,12 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
-import { ArrowLeft, MapPin, Clock, ChevronRight, Smartphone, Wallet, Banknote, Loader2 } from "lucide-react"
+import { ArrowLeft, MapPin, Clock, ChevronRight, Smartphone, CreditCard, Loader2 } from "lucide-react"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { createClient } from "@/lib/supabase/client"
-import { initiateStkPush } from "@/app/actions/mpesa"
+import { initiatePayment } from "@/app/actions/mpesa"
 
 const BARATON_LOCATIONS = [
   "Baraton University Main Gate",
@@ -97,9 +97,9 @@ export default function Errand() {
         urgency: urgency,
         scheduled_time: urgency === "scheduled" && scheduledTime ? scheduledTime : null,
         fee: total,
-        payment_method: paymentMethod,
+        payment_method: paymentMethod, // 'mpesa' or 'card'
         status: "pending",
-        payment_status: paymentMethod === "cash" ? "pending" : "processing",
+        payment_status: "pending",
       })
       .select()
       .single()
@@ -112,15 +112,15 @@ export default function Errand() {
 
     // If M-Pesa payment, initiate STK push
     if (paymentMethod === "mpesa") {
-      const mpesaResult = await initiateStkPush({
+      const mpesaResult = await initiatePayment({
         phoneNumber: mpesaPhone,
         amount: total,
-        orderId: data.id,
-        orderType: "errand",
+        referenceId: data.id,
+        type: "errand",
         description: `Baraton Errand: ${errandType}`,
       })
 
-      if (!mpesaResult.success) {
+      if (mpesaResult.error) {
         setError(mpesaResult.error || "Failed to initiate M-Pesa payment")
         await supabase
           .from("errands")
@@ -330,23 +330,12 @@ export default function Errand() {
           </div>
 
           <div className="flex items-center space-x-3 border rounded-lg p-3 bg-background">
-            <RadioGroupItem value="wallet" id="wallet" />
-            <Label htmlFor="wallet" className="flex items-center flex-1 cursor-pointer">
-              <Wallet className="h-5 w-5 text-primary mr-3" />
+            <RadioGroupItem value="card" id="card" />
+            <Label htmlFor="card" className="flex items-center flex-1 cursor-pointer">
+              <CreditCard className="h-5 w-5 text-primary mr-3" />
               <div>
-                <p className="font-medium text-foreground">BaratonPay Wallet</p>
-                <p className="text-sm text-muted-foreground">Balance: KES 2,500</p>
-              </div>
-            </Label>
-          </div>
-
-          <div className="flex items-center space-x-3 border rounded-lg p-3 bg-background">
-            <RadioGroupItem value="cash" id="cash" />
-            <Label htmlFor="cash" className="flex items-center flex-1 cursor-pointer">
-              <Banknote className="h-5 w-5 text-primary mr-3" />
-              <div>
-                <p className="font-medium text-foreground">Cash</p>
-                <p className="text-sm text-muted-foreground">Pay directly to runner</p>
+                <p className="font-medium text-foreground">Visa / Mastercard</p>
+                <p className="text-sm text-muted-foreground">Pay securely with card</p>
               </div>
             </Label>
           </div>
