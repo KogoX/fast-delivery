@@ -10,7 +10,7 @@ export default function SplashScreen() {
           <div className="w-32 h-32 rounded-full bg-green-600 flex items-center justify-center mb-6 shadow-lg">
             <span className="text-4xl font-bold text-white">BR</span>
           </div>
-          <h1 className="text-4xl font-bold text-green-800">BowRide</h1>
+          <h1 className="text-4xl font-bold text-green-800">BaratonRide</h1>
           <p className="text-xl text-green-700 mt-2 font-medium">Fast. Safe. Affordable.</p>
         </div>
 

@@ -144,7 +144,7 @@ export default function Dashboard() {
               </div>
             </SheetContent>
           </Sheet>
-          <h1 className="text-xl font-bold text-primary">BowRide</h1>
+          <h1 className="text-xl font-bold text-primary">BaratonRide</h1>
         </div>
 
         <div className="flex items-center space-x-2">
