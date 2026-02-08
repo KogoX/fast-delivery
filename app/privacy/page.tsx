@@ -38,7 +38,7 @@ export default function Privacy() {
                   <Label htmlFor="location-sharing" className="font-medium">
                     Share my location
                   </Label>
-                  <p className="text-sm text-gray-500">Allow BowRide to access your location while using the app</p>
+                  <p className="text-sm text-gray-500">Allow BaratonRide to access your location while using the app</p>
                 </div>
                 <Switch id="location-sharing" checked={locationSharing} onCheckedChange={setLocationSharing} />
               </div>
@@ -53,7 +53,7 @@ export default function Privacy() {
                   <Label htmlFor="data-collection" className="font-medium">
                     Usage data
                   </Label>
-                  <p className="text-sm text-gray-500">Allow BowRide to collect data to improve your experience</p>
+                  <p className="text-sm text-gray-500">Allow BaratonRide to collect data to improve your experience</p>
                 </div>
                 <Switch id="data-collection" checked={dataCollection} onCheckedChange={setDataCollection} />
               </div>
@@ -68,7 +68,7 @@ export default function Privacy() {
                   <Label htmlFor="marketing-emails" className="font-medium">
                     Marketing emails
                   </Label>
-                  <p className="text-sm text-gray-500">Receive promotional emails and offers from BowRide</p>
+                  <p className="text-sm text-gray-500">Receive promotional emails and offers from BaratonRide</p>
                 </div>
                 <Switch id="marketing-emails" checked={marketingEmails} onCheckedChange={setMarketingEmails} />
               </div>
@@ -107,7 +107,7 @@ export default function Privacy() {
 
         <div className="text-center text-sm text-gray-500">
           <p>
-            By using BowRide, you agree to our{" "}
+            By using BaratonRide, you agree to our{" "}
             <Link href="/terms" className="text-green-600 hover:underline">
               Terms of Service
             </Link>{" "}
