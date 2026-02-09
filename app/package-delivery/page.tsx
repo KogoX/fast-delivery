@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
@@ -13,8 +13,9 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { createClient } from "@/lib/supabase/client"
 import { initiatePayment } from "@/app/actions/mpesa"
+import { getPricingLocationsSettings } from "@/app/actions/app-settings"
 
-const BARATON_LOCATIONS = [
+const DEFAULT_LOCATIONS = [
   "Baraton University Main Gate",
   "Baraton University Library",
   "Baraton University Cafeteria",
@@ -45,7 +46,20 @@ export default function PackageDelivery() {
   const [error, setError] = useState<string | null>(null)
   const [showPickupSuggestions, setShowPickupSuggestions] = useState(false)
   const [showDeliverySuggestions, setShowDeliverySuggestions] = useState(false)
+  const [locations, setLocations] = useState(DEFAULT_LOCATIONS)
   const router = useRouter()
+
+  useEffect(() => {
+    const loadSettings = async () => {
+      const data = await getPricingLocationsSettings()
+      if (data.locations.length > 0) {
+        setLocations(data.locations)
+        setPickupLocation(data.locations[0])
+      }
+    }
+
+    loadSettings()
+  }, [])
 
   const getDeliveryFee = () => {
     const baseFees: Record<string, number> = {
@@ -68,13 +82,30 @@ export default function PackageDelivery() {
     return "30-60 mins"
   }
 
-  const filteredPickupLocations = BARATON_LOCATIONS.filter(loc =>
+  const filteredPickupLocations = locations.filter(loc =>
     loc.toLowerCase().includes(pickupLocation.toLowerCase())
   )
 
-  const filteredDeliveryLocations = BARATON_LOCATIONS.filter(loc =>
+  const filteredDeliveryLocations = locations.filter(loc =>
     loc.toLowerCase().includes(deliveryLocation.toLowerCase())
   )
+
+  const handleUseGps = (setter: (value: string) => void) => {
+    if (!navigator.geolocation) {
+      setError("GPS is not supported on this device")
+      return
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const coords = `${position.coords.latitude.toFixed(5)}, ${position.coords.longitude.toFixed(5)}`
+        setter(coords)
+      },
+      () => {
+        setError("Unable to access your location. Please enter it manually.")
+      }
+    )
+  }
 
   const handleConfirmDelivery = async () => {
     if (!deliveryLocation) {
@@ -203,6 +234,15 @@ export default function PackageDelivery() {
                     className="pl-10 border-border"
                   />
                   <MapPin className="absolute left-3 top-3 h-5 w-5 text-primary" />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="absolute right-2 top-2 h-7 text-xs text-primary"
+                    onClick={() => handleUseGps(setPickupLocation)}
+                  >
+                    Use GPS
+                  </Button>
                   {showPickupSuggestions && filteredPickupLocations.length > 0 && (
                     <div className="absolute z-10 w-full mt-1 bg-background border rounded-md shadow-lg max-h-48 overflow-y-auto">
                       {filteredPickupLocations.map((loc) => (
@@ -232,6 +272,15 @@ export default function PackageDelivery() {
                     onBlur={() => setTimeout(() => setShowDeliverySuggestions(false), 200)}
                   />
                   <MapPin className="absolute left-3 top-3 h-5 w-5 text-destructive" />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="absolute right-2 top-2 h-7 text-xs text-destructive"
+                    onClick={() => handleUseGps(setDeliveryLocation)}
+                  >
+                    Use GPS
+                  </Button>
                   {showDeliverySuggestions && filteredDeliveryLocations.length > 0 && (
                     <div className="absolute z-10 w-full mt-1 bg-background border rounded-md shadow-lg max-h-48 overflow-y-auto">
                       {filteredDeliveryLocations.map((loc) => (

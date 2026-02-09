@@ -58,6 +58,7 @@ export async function updateSession(request: NextRequest) {
     '/change-password',
     '/help',
     '/about',
+    '/admin',
   ]
 
   const isProtectedRoute = protectedRoutes.some(route => 

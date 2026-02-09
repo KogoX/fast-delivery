@@ -23,6 +23,7 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { createClient } from "@/lib/supabase/client"
+import { getUnreadNotificationsCount } from "@/app/actions/notifications"
 
 interface UserProfile {
   id: string
@@ -36,6 +37,7 @@ export default function Dashboard() {
   const [activeTab, setActiveTab] = useState("home")
   const [profile, setProfile] = useState<UserProfile | null>(null)
   const [userEmail, setUserEmail] = useState<string | null>(null)
+  const [notificationCount, setNotificationCount] = useState(0)
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -71,6 +73,17 @@ export default function Dashboard() {
     fetchUserData()
   }, [])
 
+  useEffect(() => {
+    const fetchNotificationCount = async () => {
+      const result = await getUnreadNotificationsCount()
+      if (typeof result.count === "number") {
+        setNotificationCount(result.count)
+      }
+    }
+
+    fetchNotificationCount()
+  }, [])
+
   const getInitials = (name: string | null) => {
     if (!name) return "U"
     return name.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2)
@@ -79,14 +92,18 @@ export default function Dashboard() {
   const displayName = profile?.full_name || userEmail?.split("@")[0] || "User"
 
   return (
-    <div className="flex flex-col min-h-screen bg-muted">
+    <div className="flex flex-col min-h-screen bg-gradient-to-b from-green-50 via-emerald-50 to-muted">
       {/* Header */}
-      <header className="bg-background p-4 flex items-center justify-between border-b">
+      <header className="bg-gradient-to-r from-green-600 to-emerald-600 p-4 flex items-center justify-between border-b border-emerald-500/30 text-white">
         <div className="flex items-center">
           <Sheet>
             <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" className="mr-2">
-                <Menu className="h-6 w-6" />
+              <Button
+                variant="ghost"
+                size="icon"
+                className="mr-2 text-white hover:text-white/90 hover:bg-white/10"
+              >
+                <Menu className="h-6 w-6 text-white" />
               </Button>
             </SheetTrigger>
             <SheetContent side="left" className="w-[300px] sm:w-[400px]">
@@ -144,17 +161,24 @@ export default function Dashboard() {
               </div>
             </SheetContent>
           </Sheet>
+          <h1 className="text-xl font-bold text-white">BaratonRide</h1>
           <h1 className="text-xl font-bold text-primary">BaratonRide</h1>
         </div>
 
         <div className="flex items-center space-x-2">
-          <Button variant="ghost" size="icon" className="relative">
-            <Bell className="h-6 w-6" />
-            <Badge className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 bg-primary">
-              3
-            </Badge>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="relative text-white hover:text-white/90 hover:bg-white/10"
+          >
+            <Bell className="h-6 w-6 text-white" />
+            {notificationCount > 0 && (
+              <Badge className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 bg-white text-green-700">
+                {notificationCount}
+              </Badge>
+            )}
           </Button>
-          <Avatar className="h-8 w-8">
+          <Avatar className="h-8 w-8 ring-2 ring-white/70">
             <AvatarImage src={profile?.avatar_url || "/placeholder.svg?height=32&width=32"} />
             <AvatarFallback>{getInitials(profile?.full_name)}</AvatarFallback>
           </Avatar>
@@ -163,14 +187,27 @@ export default function Dashboard() {
 
       {/* Main Content */}
       <main className="flex-1 p-4">
+        <Card className="mb-4 border-0 shadow-sm bg-gradient-to-r from-green-600 to-emerald-500 text-white">
+          <CardContent className="p-5 flex items-center justify-between">
+            <div>
+              <p className="text-sm text-white/80">Welcome back</p>
+              <h2 className="text-2xl font-semibold">{displayName}</h2>
+              <p className="text-sm text-white/80 mt-1">Ready for your next ride or delivery?</p>
+            </div>
+            <div className="hidden sm:flex items-center gap-2 rounded-full bg-white/15 px-3 py-2 text-sm">
+              <MapPin className="h-4 w-4" />
+              Bowen University
+            </div>
+          </CardContent>
+        </Card>
         {/* Location Bar */}
-        <div className="bg-background rounded-lg p-4 mb-4 flex items-center space-x-3 shadow-sm">
-          <MapPin className="h-5 w-5 text-primary flex-shrink-0" />
+        <div className="bg-background/90 backdrop-blur rounded-lg p-4 mb-4 flex items-center space-x-3 shadow-sm border border-green-100">
+          <MapPin className="h-5 w-5 text-green-600 flex-shrink-0" />
           <div className="flex-1">
             <p className="text-sm text-muted-foreground">Current Location</p>
             <p className="font-medium text-foreground">Bowen University, Main Campus</p>
           </div>
-          <Button variant="ghost" size="icon">
+          <Button variant="ghost" size="icon" className="text-green-700 hover:text-green-800">
             <Search className="h-5 w-5" />
           </Button>
         </div>
