@@ -23,6 +23,7 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { createClient } from "@/lib/supabase/client"
+import { getUnreadNotificationsCount } from "@/app/actions/notifications"
 
 interface UserProfile {
   id: string
@@ -36,6 +37,7 @@ export default function Dashboard() {
   const [activeTab, setActiveTab] = useState("home")
   const [profile, setProfile] = useState<UserProfile | null>(null)
   const [userEmail, setUserEmail] = useState<string | null>(null)
+  const [notificationCount, setNotificationCount] = useState(0)
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -69,6 +71,17 @@ export default function Dashboard() {
     }
 
     fetchUserData()
+  }, [])
+
+  useEffect(() => {
+    const fetchNotificationCount = async () => {
+      const result = await getUnreadNotificationsCount()
+      if (typeof result.count === "number") {
+        setNotificationCount(result.count)
+      }
+    }
+
+    fetchNotificationCount()
   }, [])
 
   const getInitials = (name: string | null) => {
@@ -158,9 +171,11 @@ export default function Dashboard() {
             className="relative text-white hover:text-white/90 hover:bg-white/10"
           >
             <Bell className="h-6 w-6 text-white" />
-            <Badge className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 bg-white text-green-700">
-              3
-            </Badge>
+            {notificationCount > 0 && (
+              <Badge className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 bg-white text-green-700">
+                {notificationCount}
+              </Badge>
+            )}
           </Button>
           <Avatar className="h-8 w-8 ring-2 ring-white/70">
             <AvatarImage src={profile?.avatar_url || "/placeholder.svg?height=32&width=32"} />
