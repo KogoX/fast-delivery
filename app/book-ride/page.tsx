@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
@@ -22,8 +22,10 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Label } from "@/components/ui/label"
 import { createClient } from "@/lib/supabase/client"
 import { initiatePayment } from "@/app/actions/mpesa"
+import { getPricingLocationsSettings } from "@/app/actions/app-settings"
+import type { PricingLocationsSettings } from "@/app/actions/app-settings"
 
-const BARATON_LOCATIONS = [
+const DEFAULT_LOCATIONS = [
   "Baraton University Main Gate",
   "Baraton University Library",
   "Baraton University Cafeteria",
@@ -48,20 +50,54 @@ export default function BookRide() {
   const [error, setError] = useState<string | null>(null)
   const [showPickupSuggestions, setShowPickupSuggestions] = useState(false)
   const [showDestinationSuggestions, setShowDestinationSuggestions] = useState(false)
+  const [settings, setSettings] = useState<PricingLocationsSettings | null>(null)
   const router = useRouter()
 
-  const fare = rideType === "car" ? 200 : 100
-  const serviceFee = 20
+  useEffect(() => {
+    const loadSettings = async () => {
+      const data = await getPricingLocationsSettings()
+      setSettings(data)
+      if (data.locations.length > 0) {
+        setPickupLocation(data.locations[0])
+      }
+    }
+
+    loadSettings()
+  }, [])
+
+  const carFare = settings?.ridePricing.carFare ?? 200
+  const bikeFare = settings?.ridePricing.bikeFare ?? 100
+  const fare = rideType === "car" ? carFare : bikeFare
+  const serviceFee = settings?.ridePricing.serviceFee ?? 20
   const total = fare + serviceFee
   const eta = rideType === "car" ? 5 : 3
 
-  const filteredPickupLocations = BARATON_LOCATIONS.filter(loc =>
+  const locations = settings?.locations?.length ? settings.locations : DEFAULT_LOCATIONS
+
+  const filteredPickupLocations = locations.filter(loc =>
     loc.toLowerCase().includes(pickupLocation.toLowerCase())
   )
 
-  const filteredDestinations = BARATON_LOCATIONS.filter(loc =>
+  const filteredDestinations = locations.filter(loc =>
     loc.toLowerCase().includes(destination.toLowerCase())
   )
+
+  const handleUseGps = (setter: (value: string) => void) => {
+    if (!navigator.geolocation) {
+      setError("GPS is not supported on this device")
+      return
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const coords = `${position.coords.latitude.toFixed(5)}, ${position.coords.longitude.toFixed(5)}`
+        setter(coords)
+      },
+      () => {
+        setError("Unable to access your location. Please enter it manually.")
+      }
+    )
+  }
 
   const handleBookRide = async () => {
     if (!destination) {
@@ -179,6 +215,15 @@ export default function BookRide() {
                     className="pl-10 border-border"
                   />
                   <MapPin className="absolute left-3 top-3 h-5 w-5 text-primary" />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="absolute right-2 top-2 h-7 text-xs text-primary"
+                    onClick={() => handleUseGps(setPickupLocation)}
+                  >
+                    Use GPS
+                  </Button>
                   {showPickupSuggestions && filteredPickupLocations.length > 0 && (
                     <div className="absolute z-10 w-full mt-1 bg-background border rounded-md shadow-lg max-h-48 overflow-y-auto">
                       {filteredPickupLocations.map((loc) => (
@@ -208,6 +253,15 @@ export default function BookRide() {
                     onBlur={() => setTimeout(() => setShowDestinationSuggestions(false), 200)}
                   />
                   <MapPin className="absolute left-3 top-3 h-5 w-5 text-destructive" />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="absolute right-2 top-2 h-7 text-xs text-destructive"
+                    onClick={() => handleUseGps(setDestination)}
+                  >
+                    Use GPS
+                  </Button>
                   {showDestinationSuggestions && filteredDestinations.length > 0 && (
                     <div className="absolute z-10 w-full mt-1 bg-background border rounded-md shadow-lg max-h-48 overflow-y-auto">
                       {filteredDestinations.map((loc) => (
@@ -228,7 +282,13 @@ export default function BookRide() {
                 </div>
               </div>
 
-              <Button variant="outline" size="icon" className="flex-shrink-0 bg-transparent">
+              <Button
+                type="button"
+                variant="outline"
+                size="icon"
+                className="flex-shrink-0 bg-transparent"
+                onClick={() => handleUseGps(setPickupLocation)}
+              >
                 <LocateFixed className="h-5 w-5" />
               </Button>
             </div>
@@ -263,7 +323,7 @@ export default function BookRide() {
             >
               <Car className={`h-8 w-8 mb-2 ${rideType === "car" ? "text-primary" : "text-muted-foreground"}`} />
               <span className="font-medium text-foreground">Car</span>
-              <span className="text-sm text-muted-foreground mt-1">KES 200 - 5 mins</span>
+              <span className="text-sm text-muted-foreground mt-1">KES {carFare} - 5 mins</span>
             </Label>
           </div>
 
@@ -275,7 +335,7 @@ export default function BookRide() {
             >
               <Bike className={`h-8 w-8 mb-2 ${rideType === "bike" ? "text-primary" : "text-muted-foreground"}`} />
               <span className="font-medium text-foreground">Boda Boda</span>
-              <span className="text-sm text-muted-foreground mt-1">KES 100 - 3 mins</span>
+              <span className="text-sm text-muted-foreground mt-1">KES {bikeFare} - 3 mins</span>
             </Label>
           </div>
         </RadioGroup>

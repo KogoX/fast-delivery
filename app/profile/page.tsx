@@ -242,8 +242,8 @@ export default function Profile() {
 
         {/* Version Info */}
         <div className="text-center text-sm text-muted-foreground mt-6">
-          <p>BowRide v1.0.0</p>
-          <p>2025 Bowen University</p>
+          <p>BaratonRide v1.0.0</p>
+          <p>2025 Baraton University</p>
         </div>
       </main>
     </div>
