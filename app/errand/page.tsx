@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
@@ -13,8 +13,9 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { createClient } from "@/lib/supabase/client"
 import { initiatePayment } from "@/app/actions/mpesa"
+import { getPricingLocationsSettings } from "@/app/actions/app-settings"
 
-const BARATON_LOCATIONS = [
+const DEFAULT_LOCATIONS = [
   "Baraton University Main Gate",
   "Baraton University Library",
   "Baraton University Cafeteria",
@@ -44,20 +45,41 @@ export default function Errand() {
   const [error, setError] = useState<string | null>(null)
   const [showUserSuggestions, setShowUserSuggestions] = useState(false)
   const [showErrandSuggestions, setShowErrandSuggestions] = useState(false)
+  const [locations, setLocations] = useState(DEFAULT_LOCATIONS)
   const router = useRouter()
+
+  useEffect(() => {
+    const loadSettings = async () => {
+      const data = await getPricingLocationsSettings()
+      if (data.locations.length > 0) {
+        setLocations(data.locations)
+        setUserLocation(data.locations[0])
+      }
+    }
+
+    loadSettings()
+  }, [])
 
   const serviceFee = urgency === "urgent" ? 350 : 200
   const platformFee = 20
   const total = serviceFee + platformFee
   const estimatedTime = urgency === "urgent" ? "30 mins" : "1 hour"
 
-  const filteredUserLocations = BARATON_LOCATIONS.filter(loc =>
+  const filteredUserLocations = locations.filter(loc =>
     loc.toLowerCase().includes(userLocation.toLowerCase())
   )
 
-  const filteredErrandLocations = BARATON_LOCATIONS.filter(loc =>
+  const filteredErrandLocations = locations.filter(loc =>
     loc.toLowerCase().includes(errandLocation.toLowerCase())
   )
+
+  const openGoogleMaps = (query?: string) => {
+    const search = query?.trim()
+      ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`
+      : "https://www.google.com/maps"
+
+    window.open(search, "_blank", "noopener,noreferrer")
+  }
 
   const handleConfirmErrand = async () => {
     if (!errandLocation) {
@@ -175,7 +197,10 @@ export default function Errand() {
                     onBlur={() => setTimeout(() => setShowUserSuggestions(false), 200)}
                     className="pl-10 border-border"
                   />
-                  <MapPin className="absolute left-3 top-3 h-5 w-5 text-primary" />
+                  <MapPin
+                    className="absolute left-3 top-3 h-5 w-5 text-primary cursor-pointer"
+                    onClick={() => openGoogleMaps(userLocation)}
+                  />
                   {showUserSuggestions && filteredUserLocations.length > 0 && (
                     <div className="absolute z-10 w-full mt-1 bg-background border rounded-md shadow-lg max-h-48 overflow-y-auto">
                       {filteredUserLocations.map((loc) => (
@@ -204,7 +229,10 @@ export default function Errand() {
                     onFocus={() => setShowErrandSuggestions(true)}
                     onBlur={() => setTimeout(() => setShowErrandSuggestions(false), 200)}
                   />
-                  <MapPin className="absolute left-3 top-3 h-5 w-5 text-destructive" />
+                  <MapPin
+                    className="absolute left-3 top-3 h-5 w-5 text-destructive cursor-pointer"
+                    onClick={() => openGoogleMaps(errandLocation)}
+                  />
                   {showErrandSuggestions && filteredErrandLocations.length > 0 && (
                     <div className="absolute z-10 w-full mt-1 bg-background border rounded-md shadow-lg max-h-48 overflow-y-auto">
                       {filteredErrandLocations.map((loc) => (

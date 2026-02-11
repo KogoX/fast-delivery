@@ -58,6 +58,7 @@ export async function updateSession(request: NextRequest) {
     '/change-password',
     '/help',
     '/about',
+    '/admin',
   ]
 
   const isProtectedRoute = protectedRoutes.some(route => 
@@ -68,6 +69,21 @@ export async function updateSession(request: NextRequest) {
     const url = request.nextUrl.clone()
     url.pathname = '/login'
     return NextResponse.redirect(url)
+  }
+
+  // Admin routes require authenticated admin users
+  if (user && request.nextUrl.pathname.startsWith('/admin')) {
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('is_admin')
+      .eq('id', user.id)
+      .single()
+
+    if (!profile?.is_admin) {
+      const url = request.nextUrl.clone()
+      url.pathname = '/dashboard'
+      return NextResponse.redirect(url)
+    }
   }
 
   // Redirect authenticated users away from login/onboarding pages

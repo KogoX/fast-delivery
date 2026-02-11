@@ -90,7 +90,7 @@ export default function PaymentMethods() {
       <main className="flex-1 p-4 space-y-6">
         {/* Wallet */}
         <div>
-          <h2 className="text-lg font-semibold mb-3">BowWallet</h2>
+          <h2 className="text-lg font-semibold mb-3">Wallet</h2>
           <Card>
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
@@ -99,7 +99,7 @@ export default function PaymentMethods() {
                     <Wallet className="h-5 w-5 text-green-600" />
                   </div>
                   <div>
-                    <p className="font-medium">BowWallet Balance</p>
+                    <p className="font-medium">Wallet Balance</p>
                     <p className="text-2xl font-bold text-green-600">₦2,500</p>
                   </div>
                 </div>

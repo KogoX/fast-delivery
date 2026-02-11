@@ -1,5 +1,8 @@
 // M-Pesa Daraja API Integration
 const MPESA_ENV = process.env.MPESA_ENVIRONMENT || 'sandbox'
+const MPESA_MOCK = process.env.MPESA_MOCK === 'true'
+const MPESA_MOCK_RESPONSE_CODE = process.env.MPESA_MOCK_RESPONSE_CODE || '0'
+const MPESA_MOCK_RESULT_CODE = process.env.MPESA_MOCK_RESULT_CODE || '0'
 const BASE_URL = MPESA_ENV === 'live' 
   ? 'https://api.safaricom.co.ke' 
   : 'https://sandbox.safaricom.co.ke'
@@ -34,6 +37,9 @@ export interface STKCallbackResult {
 
 // Get OAuth token
 export async function getAccessToken(): Promise<string> {
+  if (MPESA_MOCK) {
+    return 'mock-access-token'
+  }
   const consumerKey = process.env.MPESA_CONSUMER_KEY
   const consumerSecret = process.env.MPESA_CONSUMER_SECRET
 
@@ -111,6 +117,15 @@ function generateTimestamp(): string {
 
 // Initiate STK Push
 export async function initiateSTKPush(request: STKPushRequest): Promise<STKPushResponse> {
+  if (MPESA_MOCK) {
+    return {
+      MerchantRequestID: `mock-${Date.now()}`,
+      CheckoutRequestID: `mock-${Date.now()}`,
+      ResponseCode: MPESA_MOCK_RESPONSE_CODE,
+      ResponseDescription: 'Mocked M-Pesa response',
+      CustomerMessage: 'Mocked M-Pesa STK push',
+    }
+  }
   const accessToken = await getAccessToken()
   const timestamp = generateTimestamp()
   const password = generatePassword(timestamp)
@@ -160,6 +175,12 @@ export async function querySTKPushStatus(checkoutRequestId: string): Promise<{
   ResultCode: string
   ResultDesc: string
 }> {
+  if (MPESA_MOCK) {
+    return {
+      ResultCode: MPESA_MOCK_RESULT_CODE,
+      ResultDesc: 'Mocked M-Pesa status query',
+    }
+  }
   const accessToken = await getAccessToken()
   const timestamp = generateTimestamp()
   const password = generatePassword(timestamp)

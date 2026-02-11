@@ -56,7 +56,7 @@ export default function Language() {
         </Card>
 
         <div className="text-center text-sm text-gray-500">
-          <p>Language preferences will be applied to all BowRide services.</p>
+          <p>Language preferences will be applied to all BaratonRide services.</p>
         </div>
 
         <Button className="w-full bg-green-600 hover:bg-green-700">Save Changes</Button>
