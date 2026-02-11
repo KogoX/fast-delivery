@@ -21,7 +21,7 @@ export default function SafetyHelp() {
     {
       question: "How are drivers verified?",
       answer:
-        "All drivers on BaratonRide are verified Bowen University community members. They undergo background checks, vehicle inspections, and must maintain good ratings to continue using the platform.",
+        "All drivers on BaratonRide are verified Baraton University community members. They undergo background checks, vehicle inspections, and must maintain good ratings to continue using the platform.",
     },
     {
       question: "How do I report a safety concern?",

@@ -15,7 +15,7 @@ export default function RideDetails({ params }: { params: { id: string } }) {
     id: params.id,
     date: "May 7, 2025",
     time: "2:30 PM",
-    pickup: "Bowen University, Main Gate",
+    pickup: "Baraton University, Main Gate",
     destination: "Female Hostel",
     amount: "₦550",
     paymentMethod: "BowWallet",

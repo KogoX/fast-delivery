@@ -147,6 +147,21 @@ export default function Dashboard() {
                         <span className="text-foreground">Settings</span>
                       </Link>
                     </li>
+                    <li>
+                      <Link href="/admin/settings" className="flex items-center space-x-3 p-3 rounded-md hover:bg-muted">
+                        <Settings className="h-5 w-5 text-primary" />
+                        <span className="text-foreground">Admin Settings</span>
+                      </Link>
+                    </li>
+                    <li>
+                      <Link
+                        href="/admin/notifications"
+                        className="flex items-center space-x-3 p-3 rounded-md hover:bg-muted"
+                      >
+                        <Bell className="h-5 w-5 text-primary" />
+                        <span className="text-foreground">Admin Notifications</span>
+                      </Link>
+                    </li>
                   </ul>
                 </nav>
 
@@ -162,7 +177,6 @@ export default function Dashboard() {
             </SheetContent>
           </Sheet>
           <h1 className="text-xl font-bold text-white">BaratonRide</h1>
-          <h1 className="text-xl font-bold text-primary">BaratonRide</h1>
         </div>
 
         <div className="flex items-center space-x-2">
@@ -196,7 +210,7 @@ export default function Dashboard() {
             </div>
             <div className="hidden sm:flex items-center gap-2 rounded-full bg-white/15 px-3 py-2 text-sm">
               <MapPin className="h-4 w-4" />
-              Bowen University
+              Baraton University
             </div>
           </CardContent>
         </Card>
@@ -205,7 +219,7 @@ export default function Dashboard() {
           <MapPin className="h-5 w-5 text-green-600 flex-shrink-0" />
           <div className="flex-1">
             <p className="text-sm text-muted-foreground">Current Location</p>
-            <p className="font-medium text-foreground">Bowen University, Main Campus</p>
+            <p className="font-medium text-foreground">Baraton University, Main Campus</p>
           </div>
           <Button variant="ghost" size="icon" className="text-green-700 hover:text-green-800">
             <Search className="h-5 w-5" />
