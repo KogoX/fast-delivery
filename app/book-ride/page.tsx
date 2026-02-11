@@ -204,16 +204,10 @@ export default function BookRide() {
                     onBlur={() => setTimeout(() => setShowPickupSuggestions(false), 200)}
                     className="pl-10 border-border"
                   />
-                  <MapPin className="absolute left-3 top-3 h-5 w-5 text-primary" />
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    className="absolute right-2 top-2 h-7 text-xs text-primary"
+                  <MapPin
+                    className="absolute left-3 top-3 h-5 w-5 text-primary cursor-pointer"
                     onClick={() => openGoogleMaps(pickupLocation)}
-                  >
-                    Google Maps
-                  </Button>
+                  />
                   {showPickupSuggestions && filteredPickupLocations.length > 0 && (
                     <div className="absolute z-10 w-full mt-1 bg-background border rounded-md shadow-lg max-h-48 overflow-y-auto">
                       {filteredPickupLocations.map((loc) => (
@@ -242,16 +236,10 @@ export default function BookRide() {
                     onFocus={() => setShowDestinationSuggestions(true)}
                     onBlur={() => setTimeout(() => setShowDestinationSuggestions(false), 200)}
                   />
-                  <MapPin className="absolute left-3 top-3 h-5 w-5 text-destructive" />
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    className="absolute right-2 top-2 h-7 text-xs text-destructive"
+                  <MapPin
+                    className="absolute left-3 top-3 h-5 w-5 text-destructive cursor-pointer"
                     onClick={() => openGoogleMaps(destination)}
-                  >
-                    Google Maps
-                  </Button>
+                  />
                   {showDestinationSuggestions && filteredDestinations.length > 0 && (
                     <div className="absolute z-10 w-full mt-1 bg-background border rounded-md shadow-lg max-h-48 overflow-y-auto">
                       {filteredDestinations.map((loc) => (
@@ -272,15 +260,6 @@ export default function BookRide() {
                 </div>
               </div>
 
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                className="flex-shrink-0 bg-transparent"
-                onClick={() => openGoogleMaps(pickupLocation)}
-              >
-                Open Map
-              </Button>
             </div>
           </CardContent>
         </Card>
