@@ -14,9 +14,9 @@ export default function PaymentsHelp() {
         "To add a payment method, go to Settings > Payment Methods > Add Card. Enter your card details and save to add a new payment method.",
     },
     {
-      question: "How do I top up my BowWallet?",
+      question: "How do I top up my Wallet?",
       answer:
-        "To top up your BowWallet, go to Settings > Payment Methods. Under the BowWallet section, tap on 'Top Up' and follow the instructions to add funds.",
+        "To top up your Wallet, go to Settings > Payment Methods. Under the Wallet section, tap on 'Top Up' and follow the instructions to add funds.",
     },
     {
       question: "Why was my payment declined?",
@@ -43,7 +43,7 @@ export default function PaymentsHelp() {
     },
     {
       icon: <Wallet className="h-5 w-5 text-green-600" />,
-      title: "BowWallet",
+      title: "Wallet",
       link: "/help/payments/wallet",
     },
     {
