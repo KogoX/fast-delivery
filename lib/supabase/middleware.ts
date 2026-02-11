@@ -71,6 +71,21 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(url)
   }
 
+  // Admin routes require authenticated admin users
+  if (user && request.nextUrl.pathname.startsWith('/admin')) {
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('is_admin')
+      .eq('id', user.id)
+      .single()
+
+    if (!profile?.is_admin) {
+      const url = request.nextUrl.clone()
+      url.pathname = '/dashboard'
+      return NextResponse.redirect(url)
+    }
+  }
+
   // Redirect authenticated users away from login/onboarding pages
   if (user && (request.nextUrl.pathname === '/login' || request.nextUrl.pathname === '/onboarding' || request.nextUrl.pathname === '/')) {
     const url = request.nextUrl.clone()

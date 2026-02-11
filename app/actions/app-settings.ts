@@ -2,6 +2,29 @@
 
 import { createClient } from '@/lib/supabase/server'
 
+async function ensureAdmin() {
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  if (!user) {
+    return { error: 'Not authenticated' as const }
+  }
+
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('is_admin')
+    .eq('id', user.id)
+    .single()
+
+  if (!profile?.is_admin) {
+    return { error: 'Admin access required' as const }
+  }
+
+  return { supabase }
+}
+
 export interface PricingLocationsSettings {
   ridePricing: {
     carFare: number
@@ -47,16 +70,12 @@ export async function getPricingLocationsSettings(): Promise<PricingLocationsSet
 }
 
 export async function updatePricingLocationsSettings(settings: PricingLocationsSettings) {
-  const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-
-  if (!user) {
-    return { error: 'Not authenticated' }
+  const admin = await ensureAdmin()
+  if ('error' in admin) {
+    return { error: admin.error }
   }
 
-  const { error } = await supabase.from('app_settings').upsert({
+  const { error } = await admin.supabase.from('app_settings').upsert({
     key: SETTINGS_KEY,
     value: settings,
     updated_at: new Date().toISOString(),

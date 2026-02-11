@@ -73,21 +73,12 @@ export default function Errand() {
     loc.toLowerCase().includes(errandLocation.toLowerCase())
   )
 
-  const handleUseGps = (setter: (value: string) => void) => {
-    if (!navigator.geolocation) {
-      setError("GPS is not supported on this device")
-      return
-    }
+  const openGoogleMaps = (query?: string) => {
+    const search = query?.trim()
+      ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`
+      : "https://www.google.com/maps"
 
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        const coords = `${position.coords.latitude.toFixed(5)}, ${position.coords.longitude.toFixed(5)}`
-        setter(coords)
-      },
-      () => {
-        setError("Unable to access your location. Please enter it manually.")
-      }
-    )
+    window.open(search, "_blank", "noopener,noreferrer")
   }
 
   const handleConfirmErrand = async () => {
@@ -212,9 +203,9 @@ export default function Errand() {
                     variant="ghost"
                     size="sm"
                     className="absolute right-2 top-2 h-7 text-xs text-primary"
-                    onClick={() => handleUseGps(setUserLocation)}
+                    onClick={() => openGoogleMaps(userLocation)}
                   >
-                    Use GPS
+                    Google Maps
                   </Button>
                   {showUserSuggestions && filteredUserLocations.length > 0 && (
                     <div className="absolute z-10 w-full mt-1 bg-background border rounded-md shadow-lg max-h-48 overflow-y-auto">
@@ -250,9 +241,9 @@ export default function Errand() {
                     variant="ghost"
                     size="sm"
                     className="absolute right-2 top-2 h-7 text-xs text-destructive"
-                    onClick={() => handleUseGps(setErrandLocation)}
+                    onClick={() => openGoogleMaps(errandLocation)}
                   >
-                    Use GPS
+                    Google Maps
                   </Button>
                   {showErrandSuggestions && filteredErrandLocations.length > 0 && (
                     <div className="absolute z-10 w-full mt-1 bg-background border rounded-md shadow-lg max-h-48 overflow-y-auto">

@@ -31,6 +31,7 @@ interface UserProfile {
   phone: string | null
   student_id: string | null
   avatar_url: string | null
+  is_admin?: boolean | null
 }
 
 export default function Dashboard() {
@@ -147,21 +148,25 @@ export default function Dashboard() {
                         <span className="text-foreground">Settings</span>
                       </Link>
                     </li>
-                    <li>
-                      <Link href="/admin/settings" className="flex items-center space-x-3 p-3 rounded-md hover:bg-muted">
-                        <Settings className="h-5 w-5 text-primary" />
-                        <span className="text-foreground">Admin Settings</span>
-                      </Link>
-                    </li>
-                    <li>
-                      <Link
-                        href="/admin/notifications"
-                        className="flex items-center space-x-3 p-3 rounded-md hover:bg-muted"
-                      >
-                        <Bell className="h-5 w-5 text-primary" />
-                        <span className="text-foreground">Admin Notifications</span>
-                      </Link>
-                    </li>
+                    {profile?.is_admin && (
+                      <>
+                        <li>
+                          <Link href="/admin/settings" className="flex items-center space-x-3 p-3 rounded-md hover:bg-muted">
+                            <Settings className="h-5 w-5 text-primary" />
+                            <span className="text-foreground">Admin Settings</span>
+                          </Link>
+                        </li>
+                        <li>
+                          <Link
+                            href="/admin/notifications"
+                            className="flex items-center space-x-3 p-3 rounded-md hover:bg-muted"
+                          >
+                            <Bell className="h-5 w-5 text-primary" />
+                            <span className="text-foreground">Admin Notifications</span>
+                          </Link>
+                        </li>
+                      </>
+                    )}
                   </ul>
                 </nav>
 

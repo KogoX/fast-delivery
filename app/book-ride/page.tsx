@@ -9,7 +9,6 @@ import { Input } from "@/components/ui/input"
 import {
   ArrowLeft,
   MapPin,
-  LocateFixed,
   Clock,
   Car,
   Bike,
@@ -82,21 +81,12 @@ export default function BookRide() {
     loc.toLowerCase().includes(destination.toLowerCase())
   )
 
-  const handleUseGps = (setter: (value: string) => void) => {
-    if (!navigator.geolocation) {
-      setError("GPS is not supported on this device")
-      return
-    }
+  const openGoogleMaps = (query?: string) => {
+    const search = query?.trim()
+      ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`
+      : "https://www.google.com/maps"
 
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        const coords = `${position.coords.latitude.toFixed(5)}, ${position.coords.longitude.toFixed(5)}`
-        setter(coords)
-      },
-      () => {
-        setError("Unable to access your location. Please enter it manually.")
-      }
-    )
+    window.open(search, "_blank", "noopener,noreferrer")
   }
 
   const handleBookRide = async () => {
@@ -220,9 +210,9 @@ export default function BookRide() {
                     variant="ghost"
                     size="sm"
                     className="absolute right-2 top-2 h-7 text-xs text-primary"
-                    onClick={() => handleUseGps(setPickupLocation)}
+                    onClick={() => openGoogleMaps(pickupLocation)}
                   >
-                    Use GPS
+                    Google Maps
                   </Button>
                   {showPickupSuggestions && filteredPickupLocations.length > 0 && (
                     <div className="absolute z-10 w-full mt-1 bg-background border rounded-md shadow-lg max-h-48 overflow-y-auto">
@@ -258,9 +248,9 @@ export default function BookRide() {
                     variant="ghost"
                     size="sm"
                     className="absolute right-2 top-2 h-7 text-xs text-destructive"
-                    onClick={() => handleUseGps(setDestination)}
+                    onClick={() => openGoogleMaps(destination)}
                   >
-                    Use GPS
+                    Google Maps
                   </Button>
                   {showDestinationSuggestions && filteredDestinations.length > 0 && (
                     <div className="absolute z-10 w-full mt-1 bg-background border rounded-md shadow-lg max-h-48 overflow-y-auto">
@@ -285,11 +275,11 @@ export default function BookRide() {
               <Button
                 type="button"
                 variant="outline"
-                size="icon"
+                size="sm"
                 className="flex-shrink-0 bg-transparent"
-                onClick={() => handleUseGps(setPickupLocation)}
+                onClick={() => openGoogleMaps(pickupLocation)}
               >
-                <LocateFixed className="h-5 w-5" />
+                Open Map
               </Button>
             </div>
           </CardContent>

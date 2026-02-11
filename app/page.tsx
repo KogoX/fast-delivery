@@ -7,8 +7,8 @@ export default function SplashScreen() {
     <div className="flex flex-col items-center justify-center min-h-screen bg-background p-4">
       <div className="flex flex-col items-center justify-center space-y-8 max-w-md w-full">
         <div className="flex flex-col items-center">
-          <div className="w-32 h-32 rounded-full bg-primary flex items-center justify-center mb-6 shadow-lg">
-            <span className="text-4xl font-bold text-primary-foreground">BR</span>
+          <div className="w-32 h-32 rounded-full bg-muted border flex items-center justify-center mb-6 shadow-sm">
+            <span className="text-4xl font-bold text-foreground">BR</span>
           </div>
           <h1 className="text-4xl font-bold text-foreground">BaratonRide</h1>
           <p className="text-xl text-muted-foreground mt-2 font-medium">Fast. Safe. Affordable.</p>
@@ -16,14 +16,14 @@ export default function SplashScreen() {
 
         <div className="w-full space-y-4 mt-12">
           <Link href="/onboarding" className="w-full">
-            <Button className="w-full py-6 text-lg">
+            <Button variant="secondary" className="w-full py-6 text-lg">
               Get Started
               <ChevronRight className="ml-2 h-5 w-5" />
             </Button>
           </Link>
 
           <div className="flex items-center justify-center space-x-2 mt-4">
-            <Link href="/login" className="text-primary hover:text-primary/90 font-medium">
+            <Link href="/login" className="text-foreground hover:text-foreground/80 font-medium">
               Already have an account? Login
             </Link>
           </div>
