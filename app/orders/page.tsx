@@ -27,7 +27,7 @@ interface PackageDelivery {
   pickup_location: string
   delivery_location: string
   recipient_name: string
-  fee: number
+  total_amount: number
   status: string
   created_at: string
   type: "package"
@@ -238,7 +238,7 @@ export default function Orders() {
                       </Button>
                     )}
                     <div className="font-semibold text-foreground">
-                      N{order.type === "food" ? (order as FoodOrder).total_amount : (order as PackageDelivery).fee}
+                      N{order.type === "food" ? (order as FoodOrder).total_amount : (order as PackageDelivery).total_amount}
                     </div>
                   </div>
                 </CardContent>

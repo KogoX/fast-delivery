@@ -144,7 +144,8 @@ export default function PackageDelivery() {
         recipient_phone: recipientPhone,
         delivery_notes: notes || null,
         delivery_time: deliveryTime,
-        fee: total,
+        delivery_fee: deliveryFee,
+        service_fee: serviceFee,
         payment_method: paymentMethod, // 'mpesa' or 'card'
         status: "pending",
         payment_status: "pending", 
