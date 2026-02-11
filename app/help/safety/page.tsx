@@ -9,9 +9,9 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 export default function SafetyHelp() {
   const faqs = [
     {
-      question: "What safety features does BowRide have?",
+      question: "What safety features does BaratonRide have?",
       answer:
-        "BowRide includes several safety features such as driver verification, real-time ride tracking, emergency assistance button, and the ability to share your ride details with trusted contacts.",
+        "BaratonRide includes several safety features such as driver verification, real-time ride tracking, emergency assistance button, and the ability to share your ride details with trusted contacts.",
     },
     {
       question: "How do I use the SOS button?",
@@ -21,7 +21,7 @@ export default function SafetyHelp() {
     {
       question: "How are drivers verified?",
       answer:
-        "All drivers on BowRide are verified Bowen University community members. They undergo background checks, vehicle inspections, and must maintain good ratings to continue using the platform.",
+        "All drivers on BaratonRide are verified Baraton University community members. They undergo background checks, vehicle inspections, and must maintain good ratings to continue using the platform.",
     },
     {
       question: "How do I report a safety concern?",

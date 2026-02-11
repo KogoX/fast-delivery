@@ -33,7 +33,7 @@ export default function Logout() {
           </div>
 
           <h1 className="text-2xl font-bold text-center mb-2 text-foreground">Logging Out</h1>
-          <p className="text-muted-foreground text-center mb-6">Thank you for using BowRide. See you soon!</p>
+          <p className="text-muted-foreground text-center mb-6">Thank you for using BaratonRide. See you soon!</p>
 
           <div className="w-full h-2 bg-muted rounded-full overflow-hidden">
             <div className="h-full bg-primary animate-[progress_2s_ease-in-out]"></div>

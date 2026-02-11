@@ -1,5 +1,6 @@
 "use client"
 
+import { useState } from "react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
@@ -7,18 +8,23 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { ArrowLeft, Star, CreditCard, MessageSquare, Phone } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
+import { Textarea } from "@/components/ui/textarea"
 
 export default function RideDetails({ params }: { params: { id: string } }) {
+  const [selectedRating, setSelectedRating] = useState(5)
+  const [experienceNote, setExperienceNote] = useState("")
+  const [submitted, setSubmitted] = useState(false)
+
   // In a real app, you would fetch the ride details based on the ID
   // For now, we'll use mock data
   const ride = {
     id: params.id,
     date: "May 7, 2025",
     time: "2:30 PM",
-    pickup: "Bowen University, Main Gate",
+    pickup: "Baraton University, Main Gate",
     destination: "Female Hostel",
     amount: "₦550",
-    paymentMethod: "BowWallet",
+    paymentMethod: "Wallet",
     status: "completed",
     driver: {
       name: "John Driver",
@@ -166,22 +172,38 @@ export default function RideDetails({ params }: { params: { id: string } }) {
           </CardContent>
         </Card>
 
-        {/* Your Rating */}
+        {/* Your Experience Rating */}
         <Card>
           <CardContent className="p-4">
-            <h3 className="font-semibold mb-4">Your Rating</h3>
+            <h3 className="font-semibold mb-4">Rate Your Experience</h3>
 
-            <div className="flex flex-col items-center">
-              <div className="flex space-x-1 mb-2">
+            <div className="space-y-4">
+              <div className="flex items-center justify-center space-x-1 mb-2">
                 {[1, 2, 3, 4, 5].map((star) => (
-                  <Star
-                    key={star}
-                    className={`h-8 w-8 ${star <= ride.userRating ? "text-yellow-500 fill-yellow-500" : "text-gray-300"}`}
-                  />
+                  <button key={star} type="button" onClick={() => setSelectedRating(star)}>
+                    <Star
+                      className={`h-8 w-8 transition-colors ${star <= selectedRating ? "text-yellow-500 fill-yellow-500" : "text-gray-300"}`}
+                    />
+                  </button>
                 ))}
               </div>
 
-              <p className="text-sm text-gray-500">You rated this ride {ride.userRating} stars</p>
+              <p className="text-sm text-gray-500 text-center">Selected rating: {selectedRating} star{selectedRating > 1 ? "s" : ""}</p>
+
+              <Textarea
+                placeholder="Tell us about your ride experience (optional)"
+                value={experienceNote}
+                onChange={(event) => setExperienceNote(event.target.value)}
+                className="resize-none"
+              />
+
+              <Button className="w-full" onClick={() => setSubmitted(true)}>
+                Submit Rating
+              </Button>
+
+              {submitted && (
+                <p className="text-sm text-green-600 text-center">Thanks for your feedback! Your rating has been recorded.</p>
+              )}
             </div>
           </CardContent>
         </Card>

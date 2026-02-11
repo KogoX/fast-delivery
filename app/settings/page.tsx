@@ -201,7 +201,7 @@ export default function Settings() {
                   <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center mr-3">
                     <Info className="h-4 w-4 text-green-600" />
                   </div>
-                  <span>About BowRide</span>
+                  <span>About BaratonRide</span>
                 </div>
                 <ChevronRight className="h-5 w-5 text-gray-400" />
               </Link>
@@ -217,8 +217,8 @@ export default function Settings() {
 
         {/* Version Info */}
         <div className="text-center text-sm text-gray-500 mt-6">
-          <p>BowRide v1.0.0</p>
-          <p>© 2025 Bowen University</p>
+          <p>BaratonRide v1.0.0</p>
+          <p>© 2025 Baraton University</p>
         </div>
       </main>
 
@@ -226,7 +226,7 @@ export default function Settings() {
       <Dialog open={logoutDialogOpen} onOpenChange={setLogoutDialogOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>Logout from BowRide?</DialogTitle>
+            <DialogTitle>Logout from BaratonRide?</DialogTitle>
             <DialogDescription>You will need to login again to use the app.</DialogDescription>
           </DialogHeader>
           <DialogFooter className="flex flex-col sm:flex-row sm:justify-between gap-2">
