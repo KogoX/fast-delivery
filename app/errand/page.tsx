@@ -73,21 +73,12 @@ export default function Errand() {
     loc.toLowerCase().includes(errandLocation.toLowerCase())
   )
 
-  const handleUseGps = (setter: (value: string) => void) => {
-    if (!navigator.geolocation) {
-      setError("GPS is not supported on this device")
-      return
-    }
+  const openGoogleMaps = (query?: string) => {
+    const search = query?.trim()
+      ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`
+      : "https://www.google.com/maps"
 
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        const coords = `${position.coords.latitude.toFixed(5)}, ${position.coords.longitude.toFixed(5)}`
-        setter(coords)
-      },
-      () => {
-        setError("Unable to access your location. Please enter it manually.")
-      }
-    )
+    window.open(search, "_blank", "noopener,noreferrer")
   }
 
   const handleConfirmErrand = async () => {
@@ -206,16 +197,10 @@ export default function Errand() {
                     onBlur={() => setTimeout(() => setShowUserSuggestions(false), 200)}
                     className="pl-10 border-border"
                   />
-                  <MapPin className="absolute left-3 top-3 h-5 w-5 text-primary" />
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    className="absolute right-2 top-2 h-7 text-xs text-primary"
-                    onClick={() => handleUseGps(setUserLocation)}
-                  >
-                    Use GPS
-                  </Button>
+                  <MapPin
+                    className="absolute left-3 top-3 h-5 w-5 text-primary cursor-pointer"
+                    onClick={() => openGoogleMaps(userLocation)}
+                  />
                   {showUserSuggestions && filteredUserLocations.length > 0 && (
                     <div className="absolute z-10 w-full mt-1 bg-background border rounded-md shadow-lg max-h-48 overflow-y-auto">
                       {filteredUserLocations.map((loc) => (
@@ -244,16 +229,10 @@ export default function Errand() {
                     onFocus={() => setShowErrandSuggestions(true)}
                     onBlur={() => setTimeout(() => setShowErrandSuggestions(false), 200)}
                   />
-                  <MapPin className="absolute left-3 top-3 h-5 w-5 text-destructive" />
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    className="absolute right-2 top-2 h-7 text-xs text-destructive"
-                    onClick={() => handleUseGps(setErrandLocation)}
-                  >
-                    Use GPS
-                  </Button>
+                  <MapPin
+                    className="absolute left-3 top-3 h-5 w-5 text-destructive cursor-pointer"
+                    onClick={() => openGoogleMaps(errandLocation)}
+                  />
                   {showErrandSuggestions && filteredErrandLocations.length > 0 && (
                     <div className="absolute z-10 w-full mt-1 bg-background border rounded-md shadow-lg max-h-48 overflow-y-auto">
                       {filteredErrandLocations.map((loc) => (

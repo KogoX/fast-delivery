@@ -32,7 +32,7 @@ export default function About() {
 
             <div className="mt-4 text-center">
               <p className="text-sm text-gray-600">
-                BaratonRide is Bowen University's official campus transportation and delivery app, designed to make getting
+                BaratonRide is Baraton University's official campus transportation and delivery app, designed to make getting
                 around campus and receiving deliveries easier for students and staff.
               </p>
             </div>
@@ -89,7 +89,7 @@ export default function About() {
           <CardContent className="p-4">
             <h2 className="font-semibold mb-3">Development Team</h2>
             <p className="text-sm text-gray-600 mb-4">
-              BaratonRide was developed by the Bowen University Computer Science Department in collaboration with the
+              BaratonRide was developed by the Baraton University Computer Science Department in collaboration with the
               Student Affairs Office.
             </p>
 
@@ -145,7 +145,7 @@ export default function About() {
         <Separator />
 
         <div className="text-center text-sm text-gray-500">
-          <p>© 2025 Bowen University</p>
+          <p>© 2025 Baraton University</p>
           <p>All rights reserved</p>
         </div>
       </main>

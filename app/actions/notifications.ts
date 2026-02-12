@@ -2,6 +2,29 @@
 
 import { createClient } from '@/lib/supabase/server'
 
+async function ensureAdmin() {
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  if (!user) {
+    return { error: 'Not authenticated' as const }
+  }
+
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('is_admin')
+    .eq('id', user.id)
+    .single()
+
+  if (!profile?.is_admin) {
+    return { error: 'Admin access required' as const }
+  }
+
+  return { userId: user.id, supabase }
+}
+
 export async function getUnreadNotificationsCount() {
   const supabase = await createClient()
   const {
@@ -47,20 +70,16 @@ interface CreateNotificationParams {
 }
 
 export async function createNotification(params: CreateNotificationParams) {
-  const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-
-  if (!user) {
-    return { error: 'Not authenticated' }
+  const admin = await ensureAdmin()
+  if ('error' in admin) {
+    return { error: admin.error }
   }
 
-  const { error } = await supabase.from('notifications').insert({
+  const { error } = await admin.supabase.from('notifications').insert({
     title: params.title,
     body: params.body,
     target_user_id: params.targetUserId || null,
-    created_by: user.id,
+    created_by: admin.userId,
   })
 
   if (error) {
