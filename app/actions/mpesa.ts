@@ -22,6 +22,18 @@ export async function initiatePayment(params: InitiatePaymentParams) {
   }
 
   try {
+    if (!Number.isFinite(params.amount) || params.amount <= 0) {
+      return { error: 'Invalid payment amount' }
+    }
+
+    if (!params.referenceId?.trim()) {
+      return { error: 'Invalid payment reference' }
+    }
+
+    if (!params.phoneNumber?.trim()) {
+      return { error: 'Phone number is required' }
+    }
+
     // Format phone number
     const formattedPhone = formatPhoneNumber(params.phoneNumber)
     
@@ -78,6 +90,10 @@ export async function checkPaymentStatus(checkoutRequestId: string) {
   }
 
   try {
+    if (!checkoutRequestId?.trim()) {
+      return { error: 'Invalid checkout request ID' }
+    }
+
     // First check our database
     const { data: payment } = await supabase
       .from('mpesa_transactions')

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useMemo } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
@@ -30,6 +30,7 @@ interface MenuItem {
   image: string | null
   description: string
   restaurant_id: string
+  category?: string | null
 }
 
 interface CartItem extends MenuItem {
@@ -127,6 +128,7 @@ export default function FoodDelivery() {
     const { data: { user } } = await supabase.auth.getUser()
     
     if (!user) {
+      setIsOrdering(false)
       router.push("/login")
       return
     }
@@ -190,9 +192,39 @@ export default function FoodDelivery() {
   const totalItems = cartItems.reduce((sum, item) => sum + item.quantity, 0)
   const totalAmount = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0)
 
-  const filteredMenuItems = menuItems.filter(item => 
-    item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    item.description?.toLowerCase().includes(searchQuery.toLowerCase())
+  const cartQuantityMap = useMemo(() => {
+    const quantityMap = new Map<string, number>()
+    for (const item of cartItems) {
+      quantityMap.set(item.id, item.quantity)
+    }
+    return quantityMap
+  }, [cartItems])
+
+  const filteredMenuItems = useMemo(
+    () =>
+      menuItems.filter((item) => {
+        const query = searchQuery.toLowerCase()
+        const matchesSearch =
+          item.name.toLowerCase().includes(query) ||
+          item.description?.toLowerCase().includes(query)
+
+        if (!matchesSearch) {
+          return false
+        }
+
+        if (activeTab === "all") {
+          return true
+        }
+
+        const normalizedTab = activeTab.toLowerCase()
+        const category = item.category?.toLowerCase()
+        return (
+          category === normalizedTab ||
+          item.description?.toLowerCase().includes(normalizedTab) ||
+          item.name.toLowerCase().includes(normalizedTab)
+        )
+      }),
+    [menuItems, searchQuery, activeTab],
   )
 
   if (isLoading) {
@@ -277,6 +309,10 @@ export default function FoodDelivery() {
                     <img
                       src={restaurant.image || "/placeholder.svg?height=80&width=80"}
                       alt={restaurant.name}
+                      width={80}
+                      height={80}
+                      loading="lazy"
+                      decoding="async"
                       className="w-full h-full object-cover"
                     />
                   </div>
@@ -317,6 +353,10 @@ export default function FoodDelivery() {
                     <img
                       src={item.image || "/placeholder.svg?height=60&width=60"}
                       alt={item.name}
+                      width={60}
+                      height={60}
+                      loading="lazy"
+                      decoding="async"
                       className="w-full h-full object-cover rounded-md"
                     />
                   </div>
@@ -328,7 +368,7 @@ export default function FoodDelivery() {
                     <p className="text-sm text-muted-foreground mt-1">{item.description}</p>
 
                     <div className="flex justify-end mt-2">
-                      {cartItems.find((cartItem) => cartItem.id === item.id) ? (
+                      {cartQuantityMap.has(item.id) ? (
                         <div className="flex items-center space-x-2">
                           <Button
                             variant="outline"
@@ -339,7 +379,7 @@ export default function FoodDelivery() {
                             <Minus className="h-4 w-4" />
                           </Button>
                           <span className="text-sm font-medium text-foreground">
-                            {cartItems.find((cartItem) => cartItem.id === item.id)?.quantity || 0}
+                            {cartQuantityMap.get(item.id) || 0}
                           </span>
                           <Button variant="outline" size="icon" className="h-7 w-7 bg-transparent" onClick={() => addToCart(item)}>
                             <Plus className="h-4 w-4" />

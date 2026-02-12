@@ -1,11 +1,17 @@
 import { createClient } from '@supabase/supabase-js'
 import { NextRequest, NextResponse } from 'next/server'
 
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
 // Use service role for callbacks since there's no user session
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-)
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+
+const supabase =
+  supabaseUrl && supabaseServiceRoleKey
+    ? createClient(supabaseUrl, supabaseServiceRoleKey)
+    : null
 
 interface CallbackBody {
   Body: {
@@ -26,10 +32,24 @@ interface CallbackBody {
 
 export async function POST(request: NextRequest) {
   try {
+    if (!supabase) {
+      console.error('Supabase credentials missing for M-Pesa callback')
+      return NextResponse.json(
+        {
+          ResultCode: 1,
+          ResultDesc: 'Server configuration error',
+        },
+        {
+          status: 500,
+          headers: {
+            'Cache-Control': 'no-store',
+          },
+        },
+      )
+    }
+
     const body: CallbackBody = await request.json()
     const callback = body.Body.stkCallback
-
-    console.log('M-Pesa callback received:', JSON.stringify(callback, null, 2))
 
     const status = callback.ResultCode === 0 ? 'completed' : 'failed'
     
@@ -92,12 +112,24 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       ResultCode: 0,
       ResultDesc: 'Callback received successfully',
+    }, {
+      headers: {
+        'Cache-Control': 'no-store',
+      },
     })
   } catch (error) {
     console.error('M-Pesa callback error:', error)
-    return NextResponse.json({
-      ResultCode: 1,
-      ResultDesc: 'Internal server error',
-    })
+    return NextResponse.json(
+      {
+        ResultCode: 1,
+        ResultDesc: 'Internal server error',
+      },
+      {
+        status: 500,
+        headers: {
+          'Cache-Control': 'no-store',
+        },
+      },
+    )
   }
 }

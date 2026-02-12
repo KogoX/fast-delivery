@@ -3,13 +3,68 @@ import { Geist, Geist_Mono } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import './globals.css'
 
-const _geist = Geist({ subsets: ["latin"] });
-const _geistMono = Geist_Mono({ subsets: ["latin"] });
+const geist = Geist({
+  subsets: ['latin'],
+  variable: '--font-geist-sans',
+  display: 'swap',
+})
+
+const geistMono = Geist_Mono({
+  subsets: ['latin'],
+  variable: '--font-geist-mono',
+  display: 'swap',
+})
 
 export const metadata: Metadata = {
-  title: 'v0 App',
-  description: 'Created with v0',
-  generator: 'v0.app',
+  metadataBase: new URL('https://baratonride.com'),
+  title: {
+    default: 'BaratonRide | Campus Ride and Delivery',
+    template: '%s | BaratonRide',
+  },
+  description:
+    'BaratonRide is Bowen University\'s ride, errand, package, and food delivery platform for faster campus transport and orders.',
+  applicationName: 'BaratonRide',
+  keywords: [
+    'BaratonRide',
+    'Bowen University rides',
+    'campus delivery app',
+    'food delivery Baraton',
+    'ride booking app',
+  ],
+  authors: [{ name: 'BaratonRide' }],
+  creator: 'BaratonRide',
+  publisher: 'BaratonRide',
+  alternates: {
+    canonical: '/',
+  },
+  openGraph: {
+    title: 'BaratonRide | Campus Ride and Delivery',
+    description:
+      'Fast and safe rides, errands, package delivery, and food ordering around campus.',
+    url: '/',
+    siteName: 'BaratonRide',
+    locale: 'en_US',
+    type: 'website',
+    images: [
+      {
+        url: '/apple-icon.png',
+        width: 180,
+        height: 180,
+        alt: 'BaratonRide logo',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'BaratonRide | Campus Ride and Delivery',
+    description:
+      'Fast and safe rides, errands, package delivery, and food ordering around campus.',
+    images: ['/apple-icon.png'],
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
   icons: {
     icon: [
       {
@@ -36,7 +91,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`font-sans antialiased`}>
+      <body className={`${geist.variable} ${geistMono.variable} font-sans antialiased`}>
         {children}
         <Analytics />
       </body>
